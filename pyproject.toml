@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=41.6"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xinfo"
+authors = [
+  { name="Mikhail Velikikh" },
+]
+description = "Command line utility to display X$ table meta-information"
+dynamic = ["version"]
+readme = "README.rst"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "prettytable>=2.5.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+xinfo = "xinfo.__main__:cmdline_main"
+
+[project.urls]
+Homepage = "https://github.com/mvelikikh/xinfo"
+Issues = "https://github.com/mvelikikh/xinfo/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "xinfo.__version__"}
