@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-xinfo = "xinfo.__main__:cmdline_main"
+xinfo = "xinfo.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/mvelikikh/xinfo"
