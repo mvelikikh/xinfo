@@ -20,12 +20,46 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "tox",
+]
+
 [project.scripts]
 xinfo = "xinfo.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/mvelikikh/xinfo"
 Issues = "https://github.com/mvelikikh/xinfo/issues"
+
+[tool.coverage]
+paths.source = [
+    "src",
+    ".tox*/*/lib/python*/site-packages",
+    ".tox*/pypy*/site-packages",
+    ".tox*\\*\\Lib\\site-packages",
+    "*/src",
+    "*\\src",
+]
+report.fail_under = 100
+report.show_missing = true
+report.skip_covered = true
+run.omit = [
+    "__main__.py",
+    # shared modules are tested separately
+    "binutils.py",
+    "formatter.py",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+]
+testpaths = "tests"
 
 [tool.setuptools.dynamic]
 version = {attr = "xinfo.__version__"}
