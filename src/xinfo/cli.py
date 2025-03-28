@@ -5,15 +5,14 @@ import importlib
 import logging
 import logging.config
 import os
+import subprocess
 import sys
 import traceback
 
 import yaml
 
 import xinfo.config.settings as settings
-from xinfo._version import __version__ as version
-
-__version__ = version
+from xinfo._version import __version__
 
 LOGGER = None
 
@@ -53,7 +52,7 @@ def _ora_bin_default():
 
     if not oh:
         raise argparse.ArgumentTypeError(
-            ("Oracle binary path is not specified, and " "ORACLE_HOME is not set")
+            ("Oracle binary path is not specified, and ORACLE_HOME is not set")
         )
 
     ora_bin = os.path.join(oh, "bin", "oracle")
@@ -73,10 +72,44 @@ def _ora_binary(path):
     return path
 
 
+def _ora_version_default():
+    """Oracle version default value."""
+    oh = os.environ.get("ORACLE_HOME")
+
+    if not oh:
+        raise argparse.ArgumentTypeError(
+            ("Oracle version is not specified, and ORACLE_HOME is not set")
+        )
+
+    ora_version_bin = os.path.join(oh, "bin", "oraversion")
+
+    if not os.path.exists(ora_version_bin):
+        raise argparse.ArgumentTypeError(
+            ("Wrong ORACLE_HOME = %s. %s does not exist" % (oh, ora_version_bin))
+        )
+
+    cmd = f"{ora_version_bin} -majorVersion"
+    LOGGER.debug(cmd)
+    exitcode, output = subprocess.getstatusoutput(cmd)
+    LOGGER.debug("exitcode=%r output=%r", exitcode, output)
+    if exitcode != 0:
+        raise RuntimeError(
+            "Unexpected exitcode = %r output = %r command = %r"
+            % (exitcode, output, cmd)
+        )
+
+    ora_version = None
+    try:
+        ora_version = int(output)
+    except ValueError:
+        raise RuntimeError("Cannot convert Oracle version to number: %r" % output)
+    return ora_version
+
+
 def _get_common_parsers():
     """Load common argparse parsers."""
-    orabin_parser = argparse.ArgumentParser(add_help=False)
-    orabin_parser.add_argument(
+    oracle_parser = argparse.ArgumentParser(add_help=False)
+    oracle_parser.add_argument(
         "-b",
         "--ora-binary",
         type=_ora_binary,
@@ -86,6 +119,17 @@ def _get_common_parsers():
             "Specify the path to Oracle binary. "
             "The program will look for $ORACLE_HOME/bin/oracle "
             "if no binary is specified"
+        ),
+    )
+    oracle_parser.add_argument(
+        "--ora-version",
+        type=int,
+        required=False,
+        default=_ora_version_default,
+        help=(
+            "Specify the major Oracle version, such as 19, 23 etc. "
+            "The program will execute $ORACLE_HOME/bin/oraversion "
+            "if no version is specified"
         ),
     )
 
@@ -123,7 +167,7 @@ def _get_common_parsers():
         help="The formatting style for command output",
     )
 
-    return [orabin_parser, force_parser, logging_parser, fmt_parser]
+    return [oracle_parser, force_parser, logging_parser, fmt_parser]
 
 
 def _handle_common_args(args):
@@ -139,6 +183,13 @@ def _handle_common_args(args):
             settings.ora_binary = ora_binary()
         else:
             settings.ora_binary = ora_binary
+
+    if args.ora_version:
+        ora_version = args.ora_version
+        if callable(ora_version):
+            settings.ora_version = ora_version()
+        else:
+            settings.ora_version = ora_version
 
     if args.force:
         settings.force = args.force
@@ -184,7 +235,9 @@ def main():
         action(args)
         sys.stdout.flush()
         return 0
-    except BrokenPipeError:
+    except argparse.ArgumentTypeError:
+        raise
+    except BrokenPipeError:  # pragma: no cover
         # Python flushes standard streams on exit; redirect remaining output
         # to devnull to avoid another BrokenPipeError at shutdown
         devnull = os.open(os.devnull, os.O_WRONLY)

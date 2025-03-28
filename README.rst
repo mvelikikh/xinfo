@@ -6,7 +6,7 @@ Command line utility to display X$ table meta-information from the Oracle binary
 Installation
 ============
 
-Download the directory `xinfo <https://downgit.github.io/#/home?url=https:%2F%2Fgithub.com%2Fmvelikikh%2Foracle%2Ftree%2Fmaster%2Ftools%2Fxinfo>`_ and run from it::
+Download the directory `xinfo <.>`_ and run from it::
 
     $ pip install .
 
@@ -39,22 +39,19 @@ Show meta-information for X$ tables from kqftab. The information is similar to X
 
 ::
 
-    usage: xinfo list [-h] [-b ORA_BINARY] [-f] [-v | -q] [-o {table,json,html}]
-                      [--with-kqftap]
-                      [expr]
+    usage: xinfo list [-h] [-b ORA_BINARY] [--ora-version ORA_VERSION] [-f] [-v | -q] [-o {table,json,html}] [--with-kqftap] [expr]
     
     List X$ tables
     
     positional arguments:
-      expr                  An expression for X$ tables to list, e.g. 'X$KSU*'.
-                            Returns all tables if not specified
+      expr                  An expression for X$ tables to list, e.g. 'X$KSU*'. Returns all tables if not specified
     
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       -b ORA_BINARY, --ora-binary ORA_BINARY
-                            Specify the path to Oracle binary. The program will
-                            look for $ORACLE_HOME/bin/oracle if no binary is
-                            specified
+                            Specify the path to Oracle binary. The program will look for $ORACLE_HOME/bin/oracle if no binary is specified
+      --ora-version ORA_VERSION
+                            Specify the major Oracle version, such as 19, 23 etc. The program will execute $ORACLE_HOME/bin/oraversion if no version is specified
       -f, --force           Set to true to refresh the local cache
       -v, --verbose         Enable verbose output
       -q, --quiet           Enable silent mode (only show warnings and errors)
@@ -123,20 +120,19 @@ desc
 
 Describe a given table. The information is similar to X$KQFCO::
 
-    usage: xinfo desc [-h] [-b ORA_BINARY] [-f] [-v | -q] [-o {table,json,html}]
-                      table
+    usage: xinfo desc [-h] [-b ORA_BINARY] [--ora-version ORA_VERSION] [-f] [-v | -q] [-o {table,json,html}] table
     
     Describe X$ tables
     
     positional arguments:
       table                 An X$ table to describe
     
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       -b ORA_BINARY, --ora-binary ORA_BINARY
-                            Specify the path to Oracle binary. The program will
-                            look for $ORACLE_HOME/bin/oracle if no binary is
-                            specified
+                            Specify the path to Oracle binary. The program will look for $ORACLE_HOME/bin/oracle if no binary is specified
+      --ora-version ORA_VERSION
+                            Specify the major Oracle version, such as 19, 23 etc. The program will execute $ORACLE_HOME/bin/oraversion if no version is specified
       -f, --force           Set to true to refresh the local cache
       -v, --verbose         Enable verbose output
       -q, --quiet           Enable silent mode (only show warnings and errors)
@@ -169,5 +165,5 @@ Prerequisites
 =============
 - Linux only
 - Python 3
-- Requires the binutils package since it calls objdump, nm, readelf under the hood
-- Tested with: 19c (19.13), 21c (21.5)
+- Requires the binutils package since it calls objdump, nm under the hood
+- Tested with: 19c (19.13), 21c (21.5), 23ai Free (23.6)
