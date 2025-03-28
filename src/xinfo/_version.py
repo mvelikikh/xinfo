@@ -1,5 +1,3 @@
-'''
-Provides xinfo version information.
-'''
+"""Provides xinfo version information."""
 
-__version__ = '0.1'
+__version__ = "0.1"
