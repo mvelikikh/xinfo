@@ -1,5 +1,8 @@
 # xinfo
 
+![Python](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.11-blue)
+![GitHub Actions](../../actions/workflows/test.yml/badge.svg)
+
 Command line utility to display X$ table meta-information from the Oracle binary.
 
 ## Installation
